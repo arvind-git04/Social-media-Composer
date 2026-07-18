@@ -17,8 +17,8 @@ const validateMedia = (media = []) => {
     }
 
     if (item.type.startsWith('image/')) {
-      if (item.size < 1024 * 1024 || item.size > 2 * 1024 * 1024) {
-        errors.push('Images must be between 1MB and 2MB.')
+      if (item.size < 1024 * 1024 || item.size > 10 * 1024 * 1024) {
+        errors.push('Images must be between 1MB and 10MB.')
       }
     }
 

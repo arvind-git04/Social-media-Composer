@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "node backend/server/index.js",
     "dev": "cd frontend && vite",
     "build": "cd frontend && vite build",
     "lint": "cd frontend && eslint .",
@@ -12,7 +13,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
