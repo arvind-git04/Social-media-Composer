@@ -1,12 +1,21 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API for Social Media Post Composer",
+  "main": "server/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js",
+    "start:server": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "keywords": [],
+  "keywords": [
+    "express",
+    "node",
+    "mongodb",
+    "social-media"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
