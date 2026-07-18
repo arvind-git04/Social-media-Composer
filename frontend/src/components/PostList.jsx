@@ -5,6 +5,7 @@ import { selectAllPosts } from '../store/postsSlice.js'
 import { selectAuthToken } from '../store/authSlice.js'
 import { selectAvailablePlatforms } from '../store/platformsSlice.js'
 import { normalizeSelectedPlatforms } from '../utils/platforms.js'
+import { groupPostsByMode } from '../utils/postGroups.js'
 
 const emptyForm = {
   title: '',
@@ -66,63 +67,79 @@ export default function PostList({ onEdit }) {
     cancelEdit()
   }
 
+  const groupedPosts = groupPostsByMode(posts)
+
   return (
     <div className="post-list">
       {status === 'loading' && <p>Loading posts…</p>}
-      {posts.map((post) => {
-        const isEditing = editingPostId === post._id
+      {['postNow', 'scheduled'].map((groupKey) => {
+        const sectionTitle = groupKey === 'postNow' ? 'Post now' : 'Scheduled'
+        const sectionPosts = groupedPosts[groupKey]
+
+        if (!sectionPosts.length) {
+          return null
+        }
 
         return (
-          <div key={post._id} className="post-item">
-            {isEditing ? (
-              <form className="edit-post-form" onSubmit={saveEdit}>
-                <input
-                  value={form.title}
-                  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-                  placeholder="Title"
-                  required
-                />
-                <textarea
-                  value={form.description}
-                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-                  placeholder="Description"
-                />
-                <select multiple value={form.platforms} onChange={handlePlatformChange} className="platform-select">
-                  {availablePlatforms.map((platform) => (
-                    <option key={platform.id} value={platform.id}>
-                      {platform.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="datetime-local"
-                  value={form.schedule}
-                  onChange={(event) => setForm((current) => ({ ...current, schedule: event.target.value }))}
-                />
-                <div className="post-actions">
-                  <button type="submit">Save</button>
-                  <button type="button" onClick={cancelEdit}>
-                    Cancel
-                  </button>
+          <section key={groupKey} className="post-group">
+            <h3>{sectionTitle}</h3>
+            {sectionPosts.map((post) => {
+              const isEditing = editingPostId === post._id
+
+              return (
+                <div key={post._id} className="post-item">
+                  {isEditing ? (
+                    <form className="edit-post-form" onSubmit={saveEdit}>
+                      <input
+                        value={form.title}
+                        onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                        placeholder="Title"
+                        required
+                      />
+                      <textarea
+                        value={form.description}
+                        onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                        placeholder="Description"
+                      />
+                      <select multiple value={form.platforms} onChange={handlePlatformChange} className="platform-select">
+                        {availablePlatforms.map((platform) => (
+                          <option key={platform.id} value={platform.id}>
+                            {platform.name}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="datetime-local"
+                        value={form.schedule}
+                        onChange={(event) => setForm((current) => ({ ...current, schedule: event.target.value }))}
+                      />
+                      <div className="post-actions">
+                        <button type="submit">Save</button>
+                        <button type="button" onClick={cancelEdit}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <h4>{post.title}</h4>
+                      <p>{post.description}</p>
+                      <small>{post.schedule ? new Date(post.schedule).toLocaleString() : 'Published immediately'}</small>
+                      <p className="platform-summary">Platforms: {Array.isArray(post.platforms) && post.platforms.length ? post.platforms.join(', ') : 'None'}</p>
+                      <div className="post-actions">
+                        <button type="button" onClick={() => startEdit(post)}>
+                          Edit
+                        </button>
+                        <button type="button" onClick={() => dispatch(deletePost({ postId: post._id, token }))}>
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </form>
-            ) : (
-              <>
-                <h4>{post.title}</h4>
-                <p>{post.description}</p>
-                <small>{post.schedule ? new Date(post.schedule).toLocaleString() : 'No schedule'}</small>
-                <p className="platform-summary">Platforms: {Array.isArray(post.platforms) && post.platforms.length ? post.platforms.join(', ') : 'None'}</p>
-                <div className="post-actions">
-                  <button type="button" onClick={() => startEdit(post)}>
-                    Edit
-                  </button>
-                  <button type="button" onClick={() => dispatch(deletePost({ postId: post._id, token }))}>
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+              )
+            })}
+          </section>
         )
       })}
     </div>

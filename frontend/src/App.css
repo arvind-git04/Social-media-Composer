@@ -1365,14 +1365,41 @@ textarea:focus {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(79, 70, 229, 0.12);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
 }
 
 .media-preview img,
 .media-preview video {
   width: 100%;
   border-radius: 18px;
-  max-height: 280px;
+  max-height: 320px;
   object-fit: cover;
+  display: block;
+}
+
+.video-preview-card {
+  display: grid;
+  gap: 10px;
+}
+
+.video-thumbnail {
+  max-height: 180px;
+  object-fit: cover;
+  border: 1px solid rgba(79, 70, 229, 0.14);
+}
+
+.video-placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border-radius: 18px;
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.video-player {
+  background: #0f172a;
 }
 
 .file-info {
@@ -1416,6 +1443,17 @@ textarea:focus {
   display: grid;
   gap: 16px;
   margin-top: 20px;
+}
+
+.post-group {
+  display: grid;
+  gap: 12px;
+}
+
+.post-group h3 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 1.05rem;
 }
 
 .post-item {

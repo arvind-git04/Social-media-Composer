@@ -100,17 +100,42 @@ export default function CreatePost() {
   const [previewUrl, setPreviewUrl] = useState('')
   const [isDragOver, setIsDragOver] = useState(false)
   const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false)
+  const [videoThumbnailUrl, setVideoThumbnailUrl] = useState('')
   const platformDropdownRef = useRef(null)
 
   useEffect(() => {
     if (!file) {
       setPreviewUrl('')
+      setVideoThumbnailUrl('')
       return undefined
     }
 
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
+
+    if (file.type.startsWith('video/')) {
+      const video = document.createElement('video')
+      video.src = url
+      video.muted = true
+      video.playsInline = true
+      video.currentTime = 0.1
+      video.onloadeddata = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = 320
+        canvas.height = 180
+        const context = canvas.getContext('2d')
+        if (context) {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height)
+          const thumbnail = canvas.toDataURL('image/jpeg', 0.8)
+          setVideoThumbnailUrl(thumbnail)
+        }
+      }
+    }
+
+    return () => {
+      URL.revokeObjectURL(url)
+      setVideoThumbnailUrl('')
+    }
   }, [file])
 
   useEffect(() => {
@@ -290,7 +315,16 @@ export default function CreatePost() {
           {file.type.startsWith('image/') ? (
             <img src={previewUrl} alt="Selected media preview" />
           ) : (
-            <video controls src={previewUrl} />
+            <>
+              <div className="video-preview-card">
+                {videoThumbnailUrl ? (
+                  <img src={videoThumbnailUrl} alt="Video thumbnail preview" className="video-thumbnail" />
+                ) : (
+                  <div className="video-placeholder">Generating thumbnail…</div>
+                )}
+                <video controls src={previewUrl} className="video-player" />
+              </div>
+            </>
           )}
           <div className="file-info">
             <strong>{file.name}</strong>
