@@ -30,7 +30,7 @@ const allowedOrigins = [
   'https://24bcy70086-unit-1-smc.vercel.app'
 ];
 
-app.use(cors({
+const corsOptions = {
   origin(origin, callback) {
     // Allow requests with no origin (e.g. Postman, curl)
     if (!origin) return callback(null, true);
@@ -43,8 +43,12 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // =====================
 // Health Route
