@@ -17,14 +17,14 @@ const validateMedia = (media = []) => {
     }
 
     if (item.type.startsWith('image/')) {
-      if (item.size < 1024 * 1024 || item.size > 10 * 1024 * 1024) {
-        errors.push('Images must be between 1MB and 10MB.')
+      if (item.size > 10 * 1024 * 1024) {
+        errors.push('Images must not exceed 10MB.')
       }
     }
 
     if (item.type.startsWith('video/')) {
-      if (item.size < 4 * 1024 * 1024 || item.size > 5 * 1024 * 1024) {
-        errors.push('Videos must be between 4MB and 5MB.')
+      if (item.size > 50 * 1024 * 1024) {
+        errors.push('Videos must not exceed 50MB.')
       }
     }
   })

@@ -1,62 +1,52 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import api from '../utils/api.js'
 
 const postsAdapter = createEntityAdapter({ sortComparer: (a, b) => b.createdAt.localeCompare(a.createdAt) })
 
 const initialState = postsAdapter.getInitialState({ status: 'idle', error: null })
 
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (token, { rejectWithValue }) => {
-  const response = await fetch('/posts', {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  })
-  const payload = await response.json()
-  if (!response.ok) {
-    return rejectWithValue(payload.message || 'Failed to load posts')
+  try {
+    const response = await api.get('/posts', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    return response.data.posts
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to load posts')
   }
-  return payload.posts
 })
 
 export const addPost = createAsyncThunk('posts/addPost', async ({ post, token }, { rejectWithValue }) => {
-  const response = await fetch('/posts', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(post),
-  })
-  const payload = await response.json()
-  if (!response.ok) {
-    return rejectWithValue(payload.message || 'Failed to create post')
+  try {
+    const response = await api.post('/posts', post, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    return response.data.post
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to create post')
   }
-  return payload.post
 })
 
 export const updatePost = createAsyncThunk('posts/updatePost', async ({ post, token }, { rejectWithValue }) => {
-  const response = await fetch(`/posts/${post._id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(post),
-  })
-  const payload = await response.json()
-  if (!response.ok) {
-    return rejectWithValue(payload.message || 'Failed to update post')
+  try {
+    const response = await api.put(`/posts/${post._id}`, post, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    return response.data.post
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to update post')
   }
-  return payload.post
 })
 
 export const deletePost = createAsyncThunk('posts/deletePost', async ({ postId, token }, { rejectWithValue }) => {
-  const response = await fetch(`/posts/${postId}`, {
-    method: 'DELETE',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  })
-  if (!response.ok) {
-    const payload = await response.json()
-    return rejectWithValue(payload.message || 'Failed to delete post')
+  try {
+    await api.delete(`/posts/${postId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    return postId
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to delete post')
   }
-  return postId
 })
 
 const postsSlice = createSlice({

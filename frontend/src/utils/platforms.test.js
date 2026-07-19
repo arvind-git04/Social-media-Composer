@@ -9,12 +9,12 @@ test('normalizes legacy platform aliases and keeps supported platforms', () => {
 
 test('accepts valid image and video sizes and rejects invalid ones', () => {
   const validImage = { type: 'image/png', size: 8 * 1024 * 1024 }
-  const validVideo = { type: 'video/mp4', size: 4.5 * 1024 * 1024 }
-  const invalidImage = { type: 'image/png', size: 500 * 1024 }
-  const invalidVideo = { type: 'video/mp4', size: 6 * 1024 * 1024 }
+  const validVideo = { type: 'video/mp4', size: 40 * 1024 * 1024 }
+  const invalidImage = { type: 'image/png', size: 11 * 1024 * 1024 }
+  const invalidVideo = { type: 'video/mp4', size: 51 * 1024 * 1024 }
 
   assert.equal(validateMediaFile(validImage), null)
   assert.equal(validateMediaFile(validVideo), null)
-  assert.match(validateMediaFile(invalidImage), /between 1MB and 10MB/)
-  assert.match(validateMediaFile(invalidVideo), /between 4MB and 5MB/)
+  assert.match(validateMediaFile(invalidImage), /10MB/)
+  assert.match(validateMediaFile(invalidVideo), /50MB/)
 })

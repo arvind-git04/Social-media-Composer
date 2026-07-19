@@ -61,15 +61,15 @@ export function validateMediaFile(file) {
   }
 
   if (file.type.startsWith('image/')) {
-    if (file.size < 1024 * 1024 || file.size > 10 * 1024 * 1024) {
-      return 'Image size must be between 1MB and 10MB.'
+    if (file.size > 10 * 1024 * 1024) {
+      return 'Images must not exceed 10MB.'
     }
     return null
   }
 
   if (file.type.startsWith('video/')) {
-    if (file.size < 4 * 1024 * 1024 || file.size > 5 * 1024 * 1024) {
-      return 'Video size must be between 4MB and 5MB.'
+    if (file.size > 50 * 1024 * 1024) {
+      return 'Videos must not exceed 50MB.'
     }
     return null
   }

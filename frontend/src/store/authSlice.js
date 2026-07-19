@@ -1,31 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/auth'
+import api from '../utils/api.js'
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
-  const response = await fetch(`${API_BASE}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  })
-  const payload = await response.json()
-  if (!response.ok) {
-    return rejectWithValue(payload.message || 'Authentication failed')
+  try {
+    const response = await api.post('/auth/login', credentials)
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Authentication failed')
   }
-  return payload
 })
 
 export const signup = createAsyncThunk('auth/signup', async (details, { rejectWithValue }) => {
-  const response = await fetch(`${API_BASE}/signup`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(details),
-  })
-  const payload = await response.json()
-  if (!response.ok) {
-    return rejectWithValue(payload.message || 'Registration failed')
+  try {
+    const response = await api.post('/auth/signup', details)
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Registration failed')
   }
-  return payload
 })
 
 const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
@@ -37,14 +28,14 @@ export const loadCurrentUser = createAsyncThunk('auth/loadCurrentUser', async (_
     return rejectWithValue('No auth token')
   }
 
-  const response = await fetch('/auth/me', {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const payload = await response.json()
-  if (!response.ok) {
-    return rejectWithValue(payload.message || 'Failed to load user')
+  try {
+    const response = await api.get('/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return response.data.user
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to load user')
   }
-  return payload.user
 })
 
 const authSlice = createSlice({
