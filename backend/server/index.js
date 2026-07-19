@@ -25,14 +25,26 @@ const app = express();
 // =====================
 app.use(helmet());
 
-app.use(cors({
-  origin: '*', // Replace with your frontend URL later
-  credentials: true
-}));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://24bcy70086-unit-1-smc.vercel.app'
+];
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan('tiny'));
+app.use(cors({
+  origin(origin, callback) {
+    // Allow requests with no origin (e.g. Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS Error: ${origin} is not allowed`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // =====================
 // Health Route
