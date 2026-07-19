@@ -47,8 +47,14 @@ const corsOptions = {
   optionsSuccessStatus: 204
 };
 
+// Apply CORS and preflight handling
 app.use(cors(corsOptions));
 app.options(/(.*)/, cors(corsOptions));
+
+// Parse JSON bodies and log requests
+app.use(express.json());
+app.use(morgan('tiny'));
+
 
 // =====================
 // Health Route
